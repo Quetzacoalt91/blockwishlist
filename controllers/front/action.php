@@ -107,6 +107,8 @@ class BlockWishlistActionModuleFrontController extends ModuleFrontController
             );
         }
 
+        // TODO: add product to stats
+
         return $this->ajaxRender(
             json_encode([
                 'success' => false,
