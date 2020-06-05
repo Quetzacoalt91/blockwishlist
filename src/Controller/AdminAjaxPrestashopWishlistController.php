@@ -18,16 +18,19 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
+namespace PrestaShop\Module\BlockWishList\Controller;
+
 use Doctrine\Common\Cache\CacheProvider;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
+use Symfony\Component\HttpFoundation\Request;
 
 class AdminAjaxPrestashopWishlistController extends FrameworkBundleAdminController
 {
-    public function __construct(CacheProvider $cache) {
+    /*public function __construct(CacheProvider $cache) {
         $this->cache = $cache;
-    }
+    }*/
 
-    public function setWishlistConfigurationAction($params)
+    public function setWishlistConfigurationAction(Request $params)
     {
         // $key must be ID of lang so json for wishlistPageName should look like:
         // {"wishlistPageName": {"1":"wishlistPageNameFR", "1":"wishlistPageNameFR"} }
@@ -53,7 +56,7 @@ class AdminAjaxPrestashopWishlistController extends FrameworkBundleAdminControll
         }
     }
 
-    public function getWishlistConfigurationAction($params)
+    public function getWishlistConfigurationAction(Request $params)
     {
         $languages = Language::getLanguages(true);
 
@@ -72,7 +75,7 @@ class AdminAjaxPrestashopWishlistController extends FrameworkBundleAdminControll
         return json_encode($datas);
     }
 
-    public function getStatisticsAction($params)
+    public function getStatisticsAction(Request $params)
     {
         // get cache
         // if ()

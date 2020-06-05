@@ -19,6 +19,7 @@
  */
 
 use PrestaShop\Module\BlockWishList\Database\Install;
+use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 use PrestaShop\PrestaShop\Core\Module\WidgetInterface;
 
 if (!defined('_PS_VERSION_')) {
@@ -168,7 +169,10 @@ class BlockWishList extends Module implements WidgetInterface
 
     public function getContent()
     {
-        Tools::redirectAdmin($this->context->link->getAdminLink('AdminAjaxPrestashopWishlistController'));
+        Tools::redirectAdmin(
+            // $this->context->controller->getContainer()->get('router')->generate('blockwishlist_home')
+            SymfonyContainer::getInstance()->get('router')->generate('blockwishlist_home')
+        );
     }
 
     /**

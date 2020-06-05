@@ -2,7 +2,7 @@ services:
   _defaults:
     public: true
 
-  blockwishlist.controller.admin.ajax:
-    class: 'AdminAjaxPrestashopWishlistController'
+  prestashop.blockwishlist.controller.admin.ajax:
+    class: PrestaShop\Module\BlockWishList\Controller\AdminAjaxPrestashopWishlistController
     arguments:
       - '@doctrine.cache.provider'

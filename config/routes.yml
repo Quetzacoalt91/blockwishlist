@@ -1,0 +1,6 @@
+blockwishlist_home:
+    path: blockwishlist/home
+    methods: [GET]
+    defaults:
+      #_controller: prestashop.blockwishlist.controller.admin.ajax::getStatisticsAction
+      _controller: PrestaShop\Module\BlockWishList\Controller\AdminAjaxPrestashopWishlistController::getStatisticsAction
