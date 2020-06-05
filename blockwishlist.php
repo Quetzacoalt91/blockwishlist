@@ -40,7 +40,16 @@ class BlockWishList extends Module implements WidgetInterface
         'displayTop',
         'displayMyAccountBlock',
     ];
-    const MODULE_ADMIN_CONTROLLER = 'AdminAjaxPrestashopWishlist';
+
+    const ADMIN_CONTROLLERS = [
+        'AdminAjaxPrestashopWishlist' => [
+            'name' => 'Module wishlist',
+            'visible' => true,
+            'class_name' => 'AdminAjaxPrestashopWishlistController',
+            // 'parent_class_name' => 'AdminParentModulesCatalog',
+            // 'core_reference' => 'AdminModulesCatalog',
+        ]
+    ];
 
     /**
      * @var bool
@@ -77,7 +86,7 @@ class BlockWishList extends Module implements WidgetInterface
             return false;
         }
 
-        if (false === $this->installTab([self::MODULE_ADMIN_CONTROLLER])) {
+        if (false === $this->installTabs(self::ADMIN_CONTROLLERS)) {
             return false;
         }
 
@@ -94,32 +103,72 @@ class BlockWishList extends Module implements WidgetInterface
     }
 
     /**
+     * Install all Tabs.
+     *
+     * @return bool
+     */
+    public function installTabs()
+    {
+        foreach (static::ADMIN_CONTROLLERS as $adminTab) {
+            if (false === $this->installTab($adminTab)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Install Tab.
+     * Used in upgrade script.
      *
      * @param array $tabData
      *
      * @return bool
      */
-    public function installTab()
+    public function installTab(array $tabData)
     {
-        $tab = new \Tab();
-        $tab->active = true;
-        $tab->class_name = self::MODULE_ADMIN_CONTROLLER;
-        $tab->name = array();
+        $position = 0;
+        $tabNameByLangId = array_fill_keys(
+            Language::getIDs(false),
+            $tabData['name']
+        );
 
-        foreach (\Language::getLanguages(true) as $lang) {
-            $tab->name[$lang['id_lang']] = $this->name;
+        if (isset($tabData['core_reference'])) {
+            $tabCoreId = Tab::getIdFromClassName($tabData['core_reference']);
+
+            if ($tabCoreId !== false) {
+                $tabCore = new Tab($tabCoreId);
+                $tabNameByLangId = $tabCore->name;
+                $position = $tabCore->position;
+                $tabCore->active = false;
+                $tabCore->save();
+            }
         }
 
-        $tab->id_parent = -1;
+        $tab = new Tab();
         $tab->module = $this->name;
+        $tab->class_name = $tabData['class_name'];
+        $tab->position = (int) $position;
+        $tab->id_parent = empty($tabData['parent_class_name']) ? -1 : Tab::getIdFromClassName($tabData['parent_class_name']);
+        $tab->name = $tabNameByLangId;
 
-        return (bool) $tab->add();
+        if (false === (bool) $tab->add()) {
+            return false;
+        }
+
+        if (Validate::isLoadedObject($tab)) {
+            // Updating the id_parent will override the position, that's why we save 2 times
+            $tab->position = (int) $position;
+            $tab->save();
+        }
+
+        return true;
     }
 
     public function getContent()
     {
-        Tools::redirectAdmin($this->context->link->getAdminLink(self::MODULE_ADMIN_CONTROLLER));
+        Tools::redirectAdmin($this->context->link->getAdminLink('AdminAjaxPrestashopWishlistController'));
     }
 
     /**
