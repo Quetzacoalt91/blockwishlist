@@ -40,6 +40,7 @@ class BlockWishList extends Module implements WidgetInterface
         'displayTop',
         'displayMyAccountBlock',
     ];
+    const MODULE_ADMIN_CONTROLLER = 'AdminAjaxPrestashopWishlist';
 
     /**
      * @var bool
@@ -76,6 +77,10 @@ class BlockWishList extends Module implements WidgetInterface
             return false;
         }
 
+        if (false === $this->installTab([self::MODULE_ADMIN_CONTROLLER])) {
+            return false;
+        }
+
         return parent::install()
             && $this->registerHook(static::HOOKS);
     }
@@ -88,23 +93,33 @@ class BlockWishList extends Module implements WidgetInterface
         return parent::uninstall();
     }
 
+    /**
+     * Install Tab.
+     *
+     * @param array $tabData
+     *
+     * @return bool
+     */
+    public function installTab()
+    {
+        $tab = new \Tab();
+        $tab->active = true;
+        $tab->class_name = self::MODULE_ADMIN_CONTROLLER;
+        $tab->name = array();
+
+        foreach (\Language::getLanguages(true) as $lang) {
+            $tab->name[$lang['id_lang']] = $this->name;
+        }
+
+        $tab->id_parent = -1;
+        $tab->module = $this->name;
+
+        return (bool) $tab->add();
+    }
+
     public function getContent()
     {
-        $createNewButtons = [];
-
-        for ($i=1; $i < 10; $i++) {
-            $createNewButtons[$i] = "lang_$i";
-        }
-
-        foreach ($createNewButtons as $key => $value) {
-            Configuration::updateValue('blockwishlist_createNewButtonLabel',[$key, $value]);
-        }
-
-        $get = Configuration::get('blockwishlist_createNewButtonLabel');
-        dump($get);
-        die;
-
-        // Tools::redirectAdmin($this->context->link->getAdminLink(static::MODULE_ADMIN_CONTROLLER));
+        Tools::redirectAdmin($this->context->link->getAdminLink(self::MODULE_ADMIN_CONTROLLER));
     }
 
     /**

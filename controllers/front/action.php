@@ -98,6 +98,11 @@ class BlockWishlistActionModuleFrontController extends ModuleFrontController
             $quantity
         );
 
+        $newStat = new PrestaShop\Module\BlockWishList\ObjectModel\Statistics;
+        $newStat->is_adding_product = true;
+        $newStat->module_ID = $id_product;
+        $newStat->save();
+
         if (false === $productIsAdded) {
             return $this->ajaxRender(
                 json_encode([
@@ -223,6 +228,12 @@ class BlockWishlistActionModuleFrontController extends ModuleFrontController
             );
 
             if (true === $isDeleted) {
+
+                $newStat = new PrestaShop\Module\BlockWishList\ObjectModel\Statistics;
+                $newStat->is_removing_product = true;
+                $newStat->module_ID = $params['id_product'];
+                $newStat->save();
+
                 return $this->ajaxRender(
                     json_encode([
                         'success' => true,

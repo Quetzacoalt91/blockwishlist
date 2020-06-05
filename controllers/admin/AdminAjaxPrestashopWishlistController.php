@@ -18,44 +18,77 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
+use Doctrine\Common\Cache\CacheProvider;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 
 class AdminAjaxPrestashopWishlistController extends FrameworkBundleAdminController
 {
-    private function setWishlistConfigurationAction($params)
+    public function __construct(CacheProvider $cache) {
+        $this->cache = $cache;
+    }
+
+    public function setWishlistConfigurationAction($params)
     {
         // $key must be ID of lang so json for wishlistPageName should look like:
         // {"wishlistPageName": {"1":"wishlistPageNameFR", "1":"wishlistPageNameFR"} }
         if (isset($params['wishlistPageName'])) {
             $wishlistNames = json_decode($params['wishlistPageName'], true);
-            foreach ($wishlistNames as $key => $value) {
-                Configuration::udpateValue('blockwishlist_wishlistPageName',[$key, $value]);
+            foreach ($wishlistNames as $langID => $value) {
+                Configuration::udpateValue('blockwishlist_wishlistPageName',[$langID => $value]);
             }
         }
 
         if (isset($params['wishlistDefaultTitle'])) {
             $wishlistDefaultTitle = json_decode($params['wishlistDefaultTitle'], true);
-            foreach ($wishlistDefaultTitle as $key => $value) {
-                Configuration::udpateValue('blockwishlist_wishlistDefaultTitle',[$key, $value]);
+            foreach ($wishlistDefaultTitle as $langID => $value) {
+                Configuration::udpateValue('blockwishlist_wishlistDefaultTitle',[$langID => $value]);
             }
         }
 
         if (isset($params['createNewButtonLabel'])) {
             $createNewButtons = json_decode($params['createNewButton'], true);
-            foreach ($createNewButtons as $key => $value) {
-                Configuration::udpateValue('blockwishlist_createNewButtonLabel',[$key, $value]);
+            foreach ($createNewButtons as $langID => $value) {
+                Configuration::udpateValue('blockwishlist_createNewButtonLabel',[$langID => $value]);
             }
         }
     }
 
-    private function getWishlistConfigurationAction($params)
+    public function getWishlistConfigurationAction($params)
     {
+        $languages = Language::getLanguages(true);
+
+        foreach ($languages as $lang) {
+            $wishlistNames[$lang['id_lang']] = Configuration::get('blockwishlist_wishlistPageName', $lang['id_lang']);
+            $wishlistDefaultTitles[$lang['id_lang']] = Configuration::get('blockwishlist_wishlistDefaultTitle', $lang['id_lang']);
+            $wishlistCreateNewButtonsLabel[$lang['id_lang']] = Configuration::get('blockwishlist_createNewButtonLabel', $lang['id_lang']);
+        }
+
         $datas = [
-            'wishlistNames' => Configuration::get('blockwishlist_wishlistPageName'),
-            'wishlistDefaultTitles' => Configuration::get('blockwishlist_wishlistDefaultTitle'),
-            'wishlistCreateNewButtonsLabel' => Configuration::get('blockwishlist_createNewButtonLabel')
+            'wishlistNames' => $wishlistNames,
+            'wishlistDefaultTitles' => $wishlistDefaultTitles,
+            'wishlistCreateNewButtonsLabel' => $wishlistCreateNewButtonsLabel
         ];
 
         return json_encode($datas);
+    }
+
+    public function getStatisticsAction($params)
+    {
+        // get cache
+        // if ()
+        $result = \Db::getInstance()->getRow('
+            SELECT *
+            FROM `'._DB_PREFIX_.'wishlist_statistics`
+            WHERE `is_adding_product` = 1
+        ');
+
+        var_dump($result);
+        die;
+
+    }
+
+    private function computeStats()
+    {
+
     }
 }

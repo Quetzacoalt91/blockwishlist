@@ -1,0 +1,4 @@
+blockwishlist.controller.admin.ajax:
+  class: 'AdminAjaxPrestashopWishlistController'
+  arguments:
+    - '@doctrine.cache.provider'

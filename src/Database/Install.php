@@ -64,6 +64,14 @@ class Install
           `date_add` datetime NOT NULL
         ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
 
+        $sql[] = 'CREATE TABLE IF NOT EXISTS `' . _DB_PREFIX_ . 'wishlist_statistics` (
+            `id` int(10) unsigned NOT NULL,
+            `module_id` int(10) unsigned NOT NULL,
+            `is_adding_product` TINYINT(1) NOT NULL,
+            `is_removing_product` TINYINT(1) NOT NULL,
+            `created_at` datetime NOT NULL
+        ) ENGINE=' . _MYSQL_ENGINE_ . ' DEFAULT CHARSET=utf8;';
+
         $result = true;
 
         foreach ($sql as $query) {
